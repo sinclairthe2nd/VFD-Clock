@@ -37,85 +37,42 @@ PORT_7_SEGMENT_H = Segmapper[MULTI_NUMBER_H];
 }
 
 
-void Multiplexer(int NUMBER_M, int NUMBER_H)
+void Multiplexer(int NUMBER_M,int NUMBER_H)
 {
-if(NUMBER_M > 9 && NUMBER_H > 9)//Both Numbers are over 10
-    {
+ int MULTI_NUMBER_M = 0; //Local Variable Definitions
+ int MULTI_NUMBER_H = 0;
+
         for (int a=0; a<10;a++)
             {
-            int MULTI_NUMBER_M=NUMBER_M%10; //This extracts the last digit using modulo
-            int MULTI_NUMBER_H=NUMBER_H%10; //This extracts the last digit using modulo
-            PORTMULTI = (1 << PORTB1)|(0<< PORTB0); // Turn on the first Display
-            
-            Display(MULTI_NUMBER_M,MULTI_NUMBER_H);
-            _delay_ms(1);
+            if (NUMBER_M >9)                     // Minute Display least significant digit
+                {  MULTI_NUMBER_M=NUMBER_M%10; } //This extracts the last digit using modulo
+            else
+                {  MULTI_NUMBER_M=NUMBER_M;    } //Feeds the number Straight Through 
 
-            MULTI_NUMBER_M=NUMBER_M/10;  //This Shaves of the last digit of inputnumber
-            MULTI_NUMBER_H=NUMBER_H/10;  //This Shaves of the last digit of inputnumber
+            if (NUMBER_H >9)                     //Hour Display least significant digit
+                {  MULTI_NUMBER_H=NUMBER_H%10; } //This extracts the last digit using modulo
+            else
+                {  MULTI_NUMBER_H=NUMBER_H;    } //Feeds the number Straight Through   
+
+            PORTMULTI = (1 << PORTB1)|(0<< PORTB0); // Turn on the first Display
+            Display(MULTI_NUMBER_M,MULTI_NUMBER_H); // Call the Display function
+            _delay_ms(1);
+            
+            if (NUMBER_M >9)                     // Minute Display most significant digit
+                {  MULTI_NUMBER_M=NUMBER_M/10; } //This shaves the last digit of
+            else
+                {  MULTI_NUMBER_M=0;           } //Displays the numeral 0   
+            
+            if (NUMBER_H >9)
+                {  MULTI_NUMBER_H=NUMBER_H/10; } //This extracts the last digit using modulo
+            else
+                {  MULTI_NUMBER_H=0;           } //Displays the numeral 0
+
             PORTMULTI = (1<< PORTB0)|(0<<PORTB1);  // Turn on Second Displayi
-
             Display(MULTI_NUMBER_M,MULTI_NUMBER_H);
             _delay_ms(1);
             }
-    }
-else if (NUMBER_M > 9 && NUMBER_H < 10) //Hours are under 10 Minutes are over 10
-    {
-     for (int a=0; a<10;a++)
-            {
-            int MULTI_NUMBER_M=NUMBER_M%10; //This extracts the last digit using modulo
-            int MULTI_NUMBER_H=NUMBER_H; //Passes through the Number since no Conditioning is needed
-            PORTMULTI = (1 << PORTB1)|(0<< PORTB0); // Turn on the first Display
-            
-            Display(MULTI_NUMBER_M,MULTI_NUMBER_H);
-            _delay_ms(1);
-
-            MULTI_NUMBER_M=NUMBER_M/10;  //This Shaves of the last digit of inputnumber
-            MULTI_NUMBER_H=NUMBER_H;     //Passes through the Number since no Conditioning is needed
-            PORTMULTI = (1<< PORTB0)|(0<<PORTB1);  // Turn on Second Display
-
-            Display(MULTI_NUMBER_M,MULTI_NUMBER_H);
-            _delay_ms(1);
-            }
-    }
-else if (NUMBER_M < 10 && NUMBER_H > 9) //Hours are over 10 Minutes are under 10
-    {
-     for (int a=0; a<10;a++)
-            {
-            int MULTI_NUMBER_M=NUMBER_H%10; //This extracts the last digit using modulo
-            int MULTI_NUMBER_H=NUMBER_M; //Passes through the Number since no Conditioning is needed
-            PORTMULTI = (1 << PORTB1)|(0<< PORTB0); // Turn on the first Display
-            
-            Display(MULTI_NUMBER_M,MULTI_NUMBER_H);
-            _delay_ms(1);
-
-            MULTI_NUMBER_M=NUMBER_H/10;  //This Shaves of the last digit of inputnumber
-            MULTI_NUMBER_H=NUMBER_M;     //Passes through the Number since no Conditioning is needed
-            PORTMULTI = (1<< PORTB0)|(0<<PORTB1);  // Turn on Second Display
-
-            Display(MULTI_NUMBER_M,MULTI_NUMBER_H);
-            _delay_ms(1);
-            }
-    }
-
-else //both are under 10 no Conditioning needed
-    {
-         for (int a=0; a<10;a++)
-            {
-            int MULTI_NUMBER_M=NUMBER_H;  //Passes through the Number since no Conditioning is needed
-            int MULTI_NUMBER_H=NUMBER_M;  //Passes through the Number since no Conditioning is needed
-            PORTMULTI = (1 << PORTB1)|(0<< PORTB0); // Turn on the first Display
-            
-            Display(MULTI_NUMBER_M,MULTI_NUMBER_H);
-            _delay_ms(1);
-
-            MULTI_NUMBER_M=NUMBER_H;    //Passes through the Number since no Conditioning is needed
-            MULTI_NUMBER_H=NUMBER_M;    //Passes through the Number since no Conditioning is needed
-            PORTMULTI = (1<< PORTB0)|(0<<PORTB1);  // Turn on Second Display
-
-            Display(MULTI_NUMBER_M,MULTI_NUMBER_H);
-            _delay_ms(1);
-            }
-    }
+   
 }
 
 void Clocker()
@@ -141,7 +98,7 @@ int main(void)
    DDR_7_SEGMENT_H=1;    //All output
    PORT_7_SEGMENT_H=0;   //All segments off
    DDR_MULTI=1;  //All Multiplexing  pins are outputs
-
+    
    while(1)               //loop forever
    {
      
